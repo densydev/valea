@@ -1,19 +1,19 @@
 package org.densy.valea;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * The core engine used to evaluate probabilities based on a provided context.
  *
  * @param <C> the type of the probability context
  */
-public final class Valea<C extends ProbabilityContext> {
+public final class Valea<C extends ProbabilityContext> implements Predicate<C> {
     private final List<ProbabilityEvaluator<C>> evaluators;
 
-    private Valea(List<ProbabilityEvaluator<C>> evaluators) {
+    private Valea(Collection<ProbabilityEvaluator<C>> evaluators) {
         this.evaluators = List.copyOf(evaluators);
     }
 
@@ -23,6 +23,7 @@ public final class Valea<C extends ProbabilityContext> {
      * @param context the context data
      * @return {@code true} if all evaluators pass, otherwise {@code false}
      */
+    @Override
     public boolean test(C context) {
         if (evaluators.isEmpty()) {
             return false;
@@ -35,14 +36,14 @@ public final class Valea<C extends ProbabilityContext> {
      */
     @SafeVarargs
     public static <C extends ProbabilityContext> Valea<C> create(ProbabilityEvaluator<C>... evaluators) {
-        return new Valea<>(Arrays.asList(evaluators));
+        return new Valea<>(List.of(evaluators));
     }
 
     /**
      * Creates a new instance with the given evaluators.
      */
     public static <C extends ProbabilityContext> Valea<C> create(Collection<ProbabilityEvaluator<C>> evaluators) {
-        return new Valea<>(List.copyOf(evaluators));
+        return new Valea<>(evaluators);
     }
 
     /**
